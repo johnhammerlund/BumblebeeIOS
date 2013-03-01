@@ -13,11 +13,7 @@ namespace BumblebeeIOS
     {
         protected WebBlock(Session session) : base(session)
         {
-            // TODO Switch to web context
-
-            // If we want we can put this here, otherwise we can leave it up to the
-            // user to extend IOSBlock and set the default tag themselves
-            Tag = Session.Driver.FindElement(By.TagName("body"));
+            session.Driver.SwitchTo().Window("Web");
         }
     }
 }

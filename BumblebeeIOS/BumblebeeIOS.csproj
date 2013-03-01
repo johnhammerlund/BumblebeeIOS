@@ -36,6 +36,15 @@
     <Reference Include="Castle.Core">
       <HintPath>..\..\Bumblebee\Bumblebee\bin\Debug\Castle.Core.dll</HintPath>
     </Reference>
+    <Reference Include="IKVM.OpenJDK.Core">
+      <HintPath>lib\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ios-server-0.6.0-custom">
+      <HintPath>lib\ios-server-0.6.0-custom.dll</HintPath>
+    </Reference>
+    <Reference Include="IosDriverJavaAdapter">
+      <HintPath>lib\IosDriverJavaAdapter.dll</HintPath>
+    </Reference>
     <Reference Include="Selenium.WebDriverBackedSelenium">
       <HintPath>..\..\Bumblebee\Bumblebee\bin\Debug\Selenium.WebDriverBackedSelenium.dll</HintPath>
     </Reference>

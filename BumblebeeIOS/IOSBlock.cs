@@ -8,11 +8,7 @@ namespace BumblebeeIOS
     {
         protected IOSBlock(Session session) : base(session)
         {
-            // TODO switch to IOS
-
-            // If we want we can put this here, otherwise we can leave it up to the
-            // user to extend IOSBlock and set the default tag themselves
-            Tag = Session.Driver.FindElement(By.ClassName("UIAWindow"));
+            session.Driver.SwitchTo().DefaultContent();
         }
     }
 }
