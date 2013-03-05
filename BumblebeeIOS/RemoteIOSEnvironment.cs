@@ -3,6 +3,10 @@ using Bumblebee.Setup;
 using OpenQA.Selenium;
 using Regression.iOS.Tests;
 using TestGallioProj.RemoteWebDriverBridge;
+using org.uiautomation.ios;
+using java.net;
+using org.json;
+using IOSCapabilities = Regression.iOS.Tests.IOSCapabilities;
 
 namespace BumblebeeIOS
 {
@@ -19,7 +23,9 @@ namespace BumblebeeIOS
 
         public IWebDriver CreateWebDriver()
         {
-            return new JavaDriver(_address, IOSCapabilities.Iphone(_bundleName));
+            var driver = new JavaDriver(_address, IOSCapabilities.Iphone(_bundleName));
+            
+            return driver;
         }
     }
 }
