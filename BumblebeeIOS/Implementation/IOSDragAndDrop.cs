@@ -21,34 +21,46 @@ namespace BumblebeeIOS.Implementation
 
         public void DragAndDrop(IWebElement drag, IWebElement drop)
         {
-            DragAndDrop(GetElementLocation(drag).X, GetElementLocation(drag).Y,
-                        GetElementLocation(drop).X, GetElementLocation(drop).Y);
+            Point dragLocation = GetElementLocation(drag);
+            Point dropLocation = GetElementLocation(drop);
+
+            DragAndDrop(dragLocation.X, dragLocation.Y,
+                        (dragLocation.X - dropLocation.X), (dragLocation.Y - dropLocation.Y));
         }
 
         public void DragAndDrop(IWebElement drag, int xDrop, int yDrop)
         {
-            DragAndDrop(GetElementLocation(drag).X, GetElementLocation(drag).Y,
+            Point dragLocation = GetElementLocation(drag);
+
+            DragAndDrop(dragLocation.X, dragLocation.Y,
                         xDrop, yDrop);
         }
 
         public void DragAndDrop(int xDrag, int yDrag, int xDrop, int yDrop)
         {
+            Console.WriteLine("UIATarget.localTarget().dragFromToForDuration({'x':" + xDrag +
+                                                        ", 'y':" + yDrag +
+                                                        "},{'x':" + (xDrop + xDrag) +
+                                                        ",'y':" + (yDrop + yDrag) + "},1);\n\n");
+
             ((IJavaScriptExecutor)Driver).ExecuteScript("UIATarget.localTarget().dragFromToForDuration({'x':" + xDrag +
                                                         ", 'y':" + yDrag + 
-                                                        "},{'x':" + xDrop + 
-                                                        ",'y':" + yDrop + "},1);");
+                                                        "},{'x':" + (xDrop + xDrag) + 
+                                                        ",'y':" + (yDrop + yDrag) + "},1);");
         }
 
         private Point GetElementLocation(IWebElement element)
         {
             var serializer = new JavaScriptSerializer();
 
-            dynamic dict = serializer.DeserializeObject(element.GetAttribute("rect").Replace('=', ':'));
 
-            int x = int.Parse(dict["origin"]["x"].ToString());
-            int y = int.Parse(dict["origin"]["y"].ToString());
-            int height = int.Parse(dict["size"]["height"].ToString());
-            int width = int.Parse(dict["size"]["width"].ToString());
+            var dict =
+                (Dictionary<string, object>)serializer.DeserializeObject(element.GetAttribute("rect").Replace('=', ':'));
+
+            int x = int.Parse(((Dictionary<string, object>)dict["origin"])["x"].ToString());
+            int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
+            int height = int.Parse(((Dictionary<string, object>)dict["size"])["height"].ToString());
+            int width = int.Parse(((Dictionary<string, object>)dict["size"])["width"].ToString());
 
             return new Point(x + width / 2, y + height / 2);
         }
