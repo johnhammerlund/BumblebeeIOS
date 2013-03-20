@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Bumblebee.Setup;
-using IosDriverJavaAdapter;
 using OpenQA.Selenium;
-using java.net;
-using org.json;
-using IOSCapabilities = IosDriverJavaAdapter.IOSCapabilities;
+using OpenQA.Selenium.Remote;
 
 namespace BumblebeeIOS
 {
@@ -21,9 +19,20 @@ namespace BumblebeeIOS
 
         public IWebDriver CreateWebDriver()
         {
-            var driver = new JavaDriver(_address, IOSCapabilities.Iphone(_bundleName));
-            
-            return driver;
+            //var test = IOSCapabilities.Iphone(_bundleName);
+            var json = new Dictionary<string, object>
+                           {
+                               {"simulator", false},
+                               {"CFBundleName", _bundleName},
+                               {"locale", "en_GB"},
+                               {"variation", "Regular"},
+                               {"timeHack", false},
+                               {"device", "iphone"},
+                               {"CFBundleVersion", "1.0"},
+                               {"language", "en"}
+                           };
+            var raw = new DesiredCapabilities(json);
+            return new RemoteWebDriver(new Uri(_address), raw);
         }
     }
 }

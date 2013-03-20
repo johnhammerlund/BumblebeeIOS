@@ -10,7 +10,7 @@ namespace BumblebeeIOS
     {
         protected IOSBlock(Session session) : base(session)
         {
-            session.Driver.SwitchTo().DefaultContent();
+            //session.Driver.SwitchTo().DefaultContent();
         }
 
         public override IPerformsDragAndDrop GetDragAndDropPerformer()
