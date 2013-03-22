@@ -9,7 +9,7 @@ using OpenQA.Selenium.Remote;
 
 namespace BumblebeeIOS
 {
-    class IOSDriver : RemoteWebDriver
+    class IOSDriver : RemoteWebDriver, ITakesScreenshot
     {
         public IOSDriver(ICommandExecutor commandExecutor, ICapabilities desiredCapabilities) : base(commandExecutor, desiredCapabilities)
         {
@@ -135,6 +135,16 @@ namespace BumblebeeIOS
                     throw new WebDriverException("Unexpected error. " + errorResponse.Value.ToString());
                 }
             }
+        }
+
+        public Screenshot GetScreenshot()
+        {
+            // Get the screenshot as base64.
+            Response screenshotResponse = this.Execute(DriverCommand.Screenshot, null);
+            string base64 = screenshotResponse.Value.ToString();
+
+            // ... and convert it.
+            return new Screenshot(base64);
         }
     }
 }
