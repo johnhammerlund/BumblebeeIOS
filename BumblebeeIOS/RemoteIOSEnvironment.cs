@@ -58,9 +58,10 @@ namespace BumblebeeIOS
             _json = jsonMap;
         }
 
+
         public IWebDriver CreateWebDriver()
         {
-            return new RemoteWebDriver(new Uri(_address), new DesiredCapabilities(_json));
+            return new IOSDriver(new Uri(_address), new DesiredCapabilities(_json) {IsJavaScriptEnabled = true});
         }
 
     }

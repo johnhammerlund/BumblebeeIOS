@@ -62,14 +62,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\CoreActions.cs" />
     <Compile Include="IOSCapabilities.cs" />
     <Compile Include="ByIOS.cs" />
     <Compile Include="Implementation\IOSDragAndDrop.cs" />
     <Compile Include="IOSBlock.cs" />
+    <Compile Include="IOSDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteIOSEnvironment.cs" />
     <Compile Include="WebBlock.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
