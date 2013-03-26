@@ -21,8 +21,8 @@ namespace BumblebeeIOS.Implementation
 
         public void DragAndDrop(IWebElement drag, IWebElement drop)
         {
-            Point dragLocation = GetElementLocation(drag);
-            Point dropLocation = GetElementLocation(drop);
+            Point dragLocation = InnerConvenience.GetElementLocation(drag);
+            Point dropLocation = InnerConvenience.GetElementLocation(drop);
 
             DragAndDrop(dragLocation.X, dragLocation.Y,
                         (dragLocation.X - dropLocation.X), (dragLocation.Y - dropLocation.Y));
@@ -30,7 +30,7 @@ namespace BumblebeeIOS.Implementation
 
         public void DragAndDrop(IWebElement drag, int xDrop, int yDrop)
         {
-            Point dragLocation = GetElementLocation(drag);
+            Point dragLocation = InnerConvenience.GetElementLocation(drag);
 
             DragAndDrop(dragLocation.X, dragLocation.Y,
                         xDrop, yDrop);
@@ -49,20 +49,5 @@ namespace BumblebeeIOS.Implementation
                                                         ",'y':" + (yDrop + yDrag) + "},1);");
         }
 
-        private Point GetElementLocation(IWebElement element)
-        {
-            var serializer = new JavaScriptSerializer();
-
-
-            var dict =
-                (Dictionary<string, object>)serializer.DeserializeObject(element.GetAttribute("rect").Replace('=', ':'));
-
-            int x = int.Parse(((Dictionary<string, object>)dict["origin"])["x"].ToString());
-            int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
-            int height = int.Parse(((Dictionary<string, object>)dict["size"])["height"].ToString());
-            int width = int.Parse(((Dictionary<string, object>)dict["size"])["width"].ToString());
-
-            return new Point(x + width / 2, y + height / 2);
-        }
     }
 }
