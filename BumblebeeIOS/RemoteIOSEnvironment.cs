@@ -61,7 +61,7 @@ namespace BumblebeeIOS
 
         public IWebDriver CreateWebDriver()
         {
-            return new IOSDriver(new Uri(_address), new DesiredCapabilities(_json) {IsJavaScriptEnabled = true});
+            return new IOSDriver(new Uri(_address), new DesiredCapabilities(_json));
         }
 
     }
