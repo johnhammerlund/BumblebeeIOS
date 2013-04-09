@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bumblebee.Implementation;
 using Bumblebee.Interfaces;
@@ -19,13 +20,22 @@ namespace BumblebeeIOS.Implementation
         {
         }
 
+        public override TResult EnterText(string text)
+        {
+            Tag.Click();
+
+            Tag.Clear();
+
+            ((IJavaScriptExecutor)ParentBlock.Session.Driver).ExecuteScript("UIATarget.localTarget().frontMostApp().keyboard().typeString(\"" + text + "\");");
+
+            return Session.CurrentBlock<TResult>(ParentBlock.Tag);
+        }
+
         public override TResult AppendText(string text)
         {
-            var uiaScript = text.Aggregate("", 
-                (current, c) => current + ("UIATarget.localTarget()frontMostApp().keyboard().buttons()[\"" + c + "\"].tap();"));
+            Tag.Click();
 
-
-            ((IJavaScriptExecutor) ParentBlock.Session.Driver).ExecuteScript(uiaScript);
+            ((IJavaScriptExecutor)ParentBlock.Session.Driver).ExecuteScript("UIATarget.localTarget().frontMostApp().keyboard().typeString(\"" + text + "\");");
 
             return Session.CurrentBlock<TResult>(ParentBlock.Tag);
         }

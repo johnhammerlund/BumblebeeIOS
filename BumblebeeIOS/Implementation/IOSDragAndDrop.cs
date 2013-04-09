@@ -38,10 +38,6 @@ namespace BumblebeeIOS.Implementation
 
         public void DragAndDrop(int xDrag, int yDrag, int xDrop, int yDrop)
         {
-            Console.WriteLine("UIATarget.localTarget().dragFromToForDuration({'x':" + xDrag +
-                                                        ", 'y':" + yDrag +
-                                                        "},{'x':" + (xDrop + xDrag) +
-                                                        ",'y':" + (yDrop + yDrag) + "},1);\n\n");
 
             ((IJavaScriptExecutor)Driver).ExecuteScript("UIATarget.localTarget().dragFromToForDuration({'x':" + xDrag +
                                                         ", 'y':" + yDrag + 

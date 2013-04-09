@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Extensions\CoreActions.cs" />
     <Compile Include="Extensions\InterfaceActions.cs" />
+    <Compile Include="Extensions\Nonstandard.cs" />
     <Compile Include="Implementation\InnerConvenience.cs" />
     <Compile Include="Implementation\IOSTextField.cs" />
     <Compile Include="Implementation\PinchAction.cs" />

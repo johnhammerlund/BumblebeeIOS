@@ -49,5 +49,19 @@ namespace BumblebeeIOS.Extensions
                                                                        "'speed': " + locationOptions.Speed + "});");
             return result.Session.CurrentBlock<TResult>();
         }
+
+        public static TResult DismissKeyboard<TResult>(this TResult result, By @by)
+            where TResult : IBlock
+        {
+            result.Session.Driver.FindElement(@by).Click();
+
+            return result.Session.CurrentBlock<TResult>();
+        }
+
+        public static TResult DismissKeyboard<TResult>(this TResult result, string byIOSName = "done")
+            where TResult : IBlock
+        {
+            return DismissKeyboard(result, ByIOS.Name(byIOSName));
+        }
     }
 }

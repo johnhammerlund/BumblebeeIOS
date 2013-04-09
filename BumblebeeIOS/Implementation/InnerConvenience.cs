@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using OpenQA.Selenium;
+using BumblebeeIOS.Extensions;
 
 namespace BumblebeeIOS.Implementation
 {
@@ -15,9 +15,8 @@ namespace BumblebeeIOS.Implementation
         {
             var serializer = new JavaScriptSerializer();
 
+            var dict = serializer.Deserialize<Dictionary<string, object>>(serializer.Serialize(element.GetAttribute<Dictionary<string, object>>("rect")));
 
-            var dict =
-                (Dictionary<string, object>)serializer.DeserializeObject(element.GetAttribute("rect").Replace('=', ':'));
 
             int x = int.Parse(((Dictionary<string, object>)dict["origin"])["x"].ToString());
             int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
@@ -31,9 +30,7 @@ namespace BumblebeeIOS.Implementation
         {
             var serializer = new JavaScriptSerializer();
 
-
-            var dict =
-                (Dictionary<string, object>)serializer.DeserializeObject(element.GetAttribute("rect").Replace('=', ':'));
+            var dict = serializer.Deserialize<Dictionary<string, object>>(serializer.Serialize(element.GetAttribute<Dictionary<string, object>>("rect")));
 
             int x = int.Parse(((Dictionary<string, object>)dict["origin"])["x"].ToString());
             int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
