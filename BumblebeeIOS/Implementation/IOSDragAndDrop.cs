@@ -25,7 +25,7 @@ namespace BumblebeeIOS.Implementation
             Point dropLocation = InnerConvenience.GetElementLocation(drop);
 
             DragAndDrop(dragLocation.X, dragLocation.Y,
-                        (dragLocation.X - dropLocation.X), (dragLocation.Y - dropLocation.Y));
+                        Math.Abs(dragLocation.X - dropLocation.X), Math.Abs(dragLocation.Y - dropLocation.Y));
         }
 
         public void DragAndDrop(IWebElement drag, int xDrop, int yDrop)

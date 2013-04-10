@@ -13,17 +13,10 @@ namespace BumblebeeIOS.Implementation
     {
         public static Point GetElementLocation(IWebElement element)
         {
-            var serializer = new JavaScriptSerializer();
+            Point location = GetElementOrigin(element);
+            Size size = GetElementSize(element);
 
-            var dict = serializer.Deserialize<Dictionary<string, object>>(serializer.Serialize(element.GetAttribute<Dictionary<string, object>>("rect")));
-
-
-            int x = int.Parse(((Dictionary<string, object>)dict["origin"])["x"].ToString());
-            int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
-            int height = int.Parse(((Dictionary<string, object>)dict["size"])["height"].ToString());
-            int width = int.Parse(((Dictionary<string, object>)dict["size"])["width"].ToString());
-
-            return new Point(x + width / 2, y + height / 2);
+            return new Point(location.X + size.Width / 2, location.Y + size.Height / 2);
         }
 
         public static Point GetElementOrigin(IWebElement element)
@@ -36,6 +29,16 @@ namespace BumblebeeIOS.Implementation
             int y = int.Parse(((Dictionary<string, object>)dict["origin"])["y"].ToString());
 
             return new Point(x, y);
+        }
+
+        public static Size GetElementSize(IWebElement element)
+        {
+            var serializer = new JavaScriptSerializer();
+
+            var dict = serializer.Deserialize<Dictionary<string, object>>(serializer.Serialize(element.GetAttribute<Dictionary<string, object>>("rect")));
+
+            return new Size(int.Parse(((Dictionary<string, object>)dict["size"])["width"].ToString()),
+                            int.Parse(((Dictionary<string, object>)dict["size"])["height"].ToString()));
         }
     }
 }

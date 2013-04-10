@@ -14,6 +14,56 @@ namespace BumblebeeIOS.Extensions
 {
     public static class InterfaceActions
     {
+        public static TParent DragToTop<TParent>(this TParent parent, Func<TParent, IElement> getDraggable)
+            where TParent : IBlock
+        {
+            IElement element = getDraggable.Invoke(parent);
+
+            Point location = InnerConvenience.GetElementLocation(element.Tag);
+            new IOSDragAndDrop(element.Session.Driver).DragAndDrop(element.Tag, 0, -1 * location.Y + 1);
+
+            return element.Session.CurrentBlock<TParent>();
+        }
+
+        public static TParent DragToBottom<TParent>(this TParent parent, Func<TParent, IElement> getDraggable)
+            where TParent : IBlock
+        {
+            IElement element = getDraggable.Invoke(parent);
+            IWebElement window = element.Session.Driver.FindElement(ByIOS.ClassName("UIAWindow"));
+
+            Point location = InnerConvenience.GetElementLocation(element.Tag);
+            Size windowSize = InnerConvenience.GetElementSize(window);
+
+            new IOSDragAndDrop(element.Session.Driver).DragAndDrop(element.Tag, 0, windowSize.Height - location.Y - 1);
+
+            return element.Session.CurrentBlock<TParent>();
+        }
+
+        public static TParent DragToRight<TParent>(this TParent parent, Func<TParent, IElement> getDraggable)
+            where TParent : IBlock
+        {
+            IElement element = getDraggable.Invoke(parent);
+            IWebElement window = element.Session.Driver.FindElement(ByIOS.ClassName("UIAWindow"));
+
+            Point location = InnerConvenience.GetElementLocation(element.Tag);
+            Size windowSize = InnerConvenience.GetElementSize(window);
+
+            new IOSDragAndDrop(element.Session.Driver).DragAndDrop(element.Tag, windowSize.Width - location.X, 0);
+
+            return element.Session.CurrentBlock<TParent>();
+        }
+
+        public static TParent DragToLeft<TParent>(this TParent parent, Func<TParent, IElement> getDraggable)
+            where TParent : IBlock
+        {
+            IElement element = getDraggable.Invoke(parent);
+
+            Point location = InnerConvenience.GetElementLocation(element.Tag);
+            new IOSDragAndDrop(element.Session.Driver).DragAndDrop(element.Tag, -1 * location.X + 1, 0);
+
+            return element.Session.CurrentBlock<TParent>();
+        }
+
         public static PinchAction<TParent> PinchOpenFrom<TParent>(this TParent result,
                                                                   Func<TParent, IHasBackingElement> getStartElement)
             where TParent : IBlock
