@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Bumblebee.Setup;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
 
 namespace BumblebeeIOS
@@ -61,7 +62,8 @@ namespace BumblebeeIOS
 
         public IWebDriver CreateWebDriver()
         {
-            return new IOSDriver(new Uri(_address), new DesiredCapabilities(_json));
+            
+            return new RemoteWebDriver(new Uri(_address), new DesiredCapabilities(_json));
         }
 
     }

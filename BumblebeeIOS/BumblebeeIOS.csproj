@@ -67,6 +67,7 @@
     <Compile Include="Extensions\Nonstandard.cs" />
     <Compile Include="Implementation\InnerConvenience.cs" />
     <Compile Include="Implementation\IOSTextField.cs" />
+    <Compile Include="Implementation\IOSPicker.cs" />
     <Compile Include="Implementation\PinchAction.cs" />
     <Compile Include="Implementation\ZoomInAction.cs" />
     <Compile Include="Implementation\ZoomOutAction.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="ByIOS.cs" />
     <Compile Include="Implementation\IOSDragAndDrop.cs" />
     <Compile Include="IOSBlock.cs" />
-    <Compile Include="IOSDriver.cs" />
     <Compile Include="UIAObjects\LocationOptions.cs" />
     <Compile Include="UIAObjects\Orientation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
