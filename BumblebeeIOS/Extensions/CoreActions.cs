@@ -50,7 +50,7 @@ namespace BumblebeeIOS.Extensions
             return result.Session.CurrentBlock<TResult>();
         }
 
-        public static TResult DismissKeyboard<TResult>(this TResult result, By @by)
+        public static TResult ResignFirstResponder<TResult>(this TResult result, By @by)
             where TResult : IBlock
         {
             result.Session.Driver.FindElement(@by).Click();
@@ -58,10 +58,10 @@ namespace BumblebeeIOS.Extensions
             return result.Session.CurrentBlock<TResult>();
         }
 
-        public static TResult DismissKeyboard<TResult>(this TResult result, string byIOSName = "done")
+        public static TResult ResignFirstResponder<TResult>(this TResult result, string byIOSName = "done")
             where TResult : IBlock
         {
-            return DismissKeyboard(result, ByIOS.Name(byIOSName));
+            return ResignFirstResponder(result, ByIOS.Name(byIOSName));
         }
     }
 }

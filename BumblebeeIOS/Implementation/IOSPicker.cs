@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -29,6 +30,11 @@ namespace BumblebeeIOS.Implementation
             return new IOSDragAndDrop(Session.Driver);
         }
 
+        protected virtual IOption<TResult> GetOption(IBlock parent, IWebElement tag, string value)
+        {
+            return new PickerOption<TResult>(parent, tag, value);
+        }
+
         public virtual IEnumerable<IOption<TResult>> Options
         {
             get
@@ -39,7 +45,48 @@ namespace BumblebeeIOS.Implementation
                             return wheel.values();
                         } return null;", Tag);
 
-                return values.Select(val => new PickerOption<TResult>(this, Tag, val.ToString()));
+                return values.Select(val => GetOption(this, Tag, val.ToString()));
+            }
+        }
+    }
+
+    public class OrderedIOSPickerWheel<TResult> : IOSPickerWheel<TResult> where TResult : IBlock
+    {
+        public OrderedIOSPickerWheel(IBlock parent, By @by) : base(parent, @by)
+        {
+        }
+
+        public OrderedIOSPickerWheel(IBlock parent, IWebElement tag)
+            : base(parent, tag)
+        {
+        }
+
+        public override IEnumerable<IOption<TResult>> Options
+        {
+            get
+            {
+                var values = (IReadOnlyCollection<object>)((IJavaScriptExecutor)Session.Driver).ExecuteScript
+                (@"var wheel = arguments[0];
+                       if (wheel.isValid()) {
+                            return wheel.values();
+                        } return null;", Tag);
+
+                IEnumerable<int> arr = values.Select(val => int.Parse(val.ToString()));
+                int min = arr.First();
+                int max = arr.Last();
+
+                if (max - min > 60)
+                {
+                    int currentVal =
+                        int.Parse((string)((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", Tag));
+                    max = currentVal + 30;
+                    min = currentVal - 30;
+                }
+
+                for (int i = min; i < max; i++)
+                {
+                    yield return GetOption(this, Tag, i.ToString());
+                }
             }
         }
     }
@@ -56,18 +103,26 @@ namespace BumblebeeIOS.Implementation
         {
         }
 
-        public override IEnumerable<IOption<TResult>> Options
+        protected override IOption<TResult> GetOption(IBlock parent, IWebElement tag, string value)
         {
-            get
-            {
-                var values = (IReadOnlyCollection<object>)((IJavaScriptExecutor)Session.Driver).ExecuteScript
-                (@"var wheel = arguments[0];
-                       if (wheel.isValid()) {
-                            return wheel.values();
-                        } return null;", Tag);
+            return new SafePickerOption<TResult>(this, tag, value);
+        }
+    }
 
-                return values.Select(val => new SafePickerOption<TResult>(this, Tag, val.ToString()));
-            }
+    public class SafeOrderedIOSPickerWheel<TResult> : OrderedIOSPickerWheel<TResult> where TResult : IBlock
+    {
+        public SafeOrderedIOSPickerWheel(IBlock parent, By @by) : base(parent, @by)
+        {
+        }
+
+        public SafeOrderedIOSPickerWheel(IBlock parent, IWebElement tag)
+            : base(parent, tag)
+        {
+        }
+
+        protected override IOption<TResult> GetOption(IBlock parent, IWebElement tag, string value)
+        {
+            return new SafeOrderedPickerOption<TResult>(parent, tag, value);
         }
     }
 
@@ -87,6 +142,11 @@ namespace BumblebeeIOS.Implementation
             Option = option;
         }
 
+        public override string Text
+        {
+            get{return Option;}
+        }
+
         protected IWebElement PickerTag { get; set; }
 
         protected string Option { get; set; }
@@ -96,29 +156,22 @@ namespace BumblebeeIOS.Implementation
             return Click<TResult>();
         }
 
-        public virtual TResult1 Click<TResult1>() where TResult1 : IBlock
+        public virtual TCustomResult Click<TCustomResult>() where TCustomResult : IBlock
         {
             var wasClicked = (bool)((IJavaScriptExecutor)Session.Driver).ExecuteScript
-                    (@"var wheel = arguments[0];
-                       var pickerItems = [];
-                       if (wheel.isValid()) {
-
-                            pickerItems = wheel.values();
-                            for(var i=0; i<pickerItems.length; i++){
-                                if(pickerItems[i].toString() == arguments[1].toString()){
-                                    UIATarget.localTarget().delay(2);
-                                    wheel.selectValue(pickerItems[i].toString());
-                                    return true;
-                                }
-                            }       
-                        } return false;", PickerTag, Option);
+                    (@"try{
+                                arguments[0].selectValue(arguments[1]);
+                                return true;
+                          } catch (e) {
+                                return false;
+                          }", PickerTag, Option);
 
             if(!wasClicked) throw new NoSuchElementException("Could not find option - " + Option);
 
-            return Session.CurrentBlock<TResult1>();
+            return Session.CurrentBlock<TCustomResult>();
         }
     }
-
+    
     public class SafePickerOption<TResult> : PickerOption<TResult> where TResult : IBlock
     {
         public SafePickerOption(IBlock parent, By @by) : base(parent, @by)
@@ -131,78 +184,86 @@ namespace BumblebeeIOS.Implementation
 
         public SafePickerOption(IBlock parent, IWebElement tag, string option) : base(parent, tag, option)
         {
+            CenterOfWheel = InnerConvenience.GetElementLocation(PickerTag);
         }
 
         private void Initialize()
         {
-            CurrentValue = PickerTag.GetAttribute("value"); //XXXX. Y of Z
-            string YofZ = CurrentValue.Substring(CurrentValue.LastIndexOf(". ", StringComparison.Ordinal) + 1);
-            string[] YandZ = YofZ.Split(new []{" of "}, StringSplitOptions.None);
+            CurrentValue =
+                ((string)((IJavaScriptExecutor) Session.Driver).ExecuteScript("return arguments[0].value", PickerTag)) ?? ""; //XXXX. Y of Z
 
-            NumValues = int.Parse(YandZ[1]);
-            Position = int.Parse(YandZ[0]);
+            NumValues =
+                (long)((IJavaScriptExecutor) Session.Driver).ExecuteScript("return arguments[0].values().length",
+                                                                         PickerTag);
+            Position =
+                (long)((IJavaScriptExecutor) Session.Driver).ExecuteScript(
+                        "for(var i=0;i<arguments[0].values().length;i++) if(arguments[0].values()[i]==arguments[1]) return i; return 0;", PickerTag, CurrentValue);
+
+            OptionPosition = (long)((IJavaScriptExecutor)Session.Driver).ExecuteScript(
+                        "for(var i=0;i<arguments[0].values().length;i++) if(arguments[0].values()[i].indexOf(arguments[1])==0) return i; return 0;", PickerTag, Option);
         }
 
         private string CurrentValue { get; set; }
 
-        private int NumValues { get; set; }
+        private long NumValues { get; set; }
 
-        private int Position { get; set; }
+        private long Position { get; set; }
+
+        private long OptionPosition { get; set; }
+
+        protected Point CenterOfWheel { get; set; }
 
         private bool TraverseUp()
         {
-            do
+            CurrentValue =
+                    ((string)((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", PickerTag)) ?? "";
+
+            if (Option.Equals(CurrentValue) || (CurrentValue.EndsWith(". " + Position + " of " + NumValues) &&
+                                                Option.Equals(CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)))))
+                return true;
+
+            if (Position > 1)
             {
-                CurrentValue = PickerTag.GetAttribute("value");
+                Position--;
 
-                Console.WriteLine("Value: [" + CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)) + "] Option: [" + Option + "]");
-
-                if (CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)).Equals(Option))
-                    return true;
-
-                new IOSDragAndDrop(Session.Driver).DragAndDrop(PickerTag, 0, 50);
+                InnerConvenience.ClickAtLocation(Session.Driver, CenterOfWheel.X, CenterOfWheel.Y - 50);
                 Thread.Sleep(500);
 
-                Position--;
-            } while (Position > 1);
-
-            Position++;
+                return TraverseUp();
+            }
 
             return false;
         }
 
         private bool TraverseDown()
         {
-            do
+            CurrentValue =
+                    (string)(((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", PickerTag)) ?? "";
+
+            if (Option.Equals(CurrentValue) || (CurrentValue.EndsWith(". " + Position + " of " + NumValues) &&
+                                                Option.Equals(CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)))))
+                return true;
+
+            if (Position < NumValues)
             {
-                CurrentValue = PickerTag.GetAttribute("value");
+                Position++;
 
-                Console.WriteLine("Value: [" + CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)) + "] Option: [" + Option + "]");
-
-                if (CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)).Equals(Option))
-                    return true;
-
-                new IOSDragAndDrop(Session.Driver).DragAndDrop(PickerTag, 0, -50);
+                InnerConvenience.ClickAtLocation(Session.Driver, CenterOfWheel.X, CenterOfWheel.Y + 50);
                 Thread.Sleep(500);
 
-                Position++;
-            } while (Position < NumValues);
-
-            Position--;
+                return TraverseDown();
+            }
 
             return false;
         }
-
-        public override TResult Click()
-        {
-            return Click<TResult>();
-        }
-
-        public override TResult1 Click<TResult1>()
+        
+        public override TCustomResult Click<TCustomResult>()
         {
             Initialize();
 
-            if (Position > NumValues/2)
+            int distance = (int)OptionPosition - (int)Position;
+
+            if (distance > 0)
             {
                 if(!TraverseUp())
                     if(!TraverseDown())
@@ -215,7 +276,49 @@ namespace BumblebeeIOS.Implementation
                         throw new NoSuchElementException("Could not find option - " + Option);
             }
 
-            return Session.CurrentBlock<TResult1>();
+            return Session.CurrentBlock<TCustomResult>();
+        }
+    }
+
+    public class SafeOrderedPickerOption<TResult> : SafePickerOption<TResult> where TResult : IBlock
+    {
+        public SafeOrderedPickerOption(IBlock parent, By @by) : base(parent, @by)
+        {
+        }
+
+        public SafeOrderedPickerOption(IBlock parent, IWebElement tag) : base(parent, tag)
+        {
+        }
+
+        public SafeOrderedPickerOption(IBlock parent, IWebElement tag, string option) : base(parent, tag, option)
+        {
+        }
+
+        public override TCustomResult Click<TCustomResult>()
+        {
+            var currentValue = (string)(((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", PickerTag)) ?? "";
+
+            int comparison = String.Compare(Option, currentValue, StringComparison.Ordinal);
+
+            if (comparison > 0)
+            {
+                InnerConvenience.ClickAtLocation(Session.Driver, CenterOfWheel.X, CenterOfWheel.Y + 50);
+                Thread.Sleep(500);
+
+                return Click<TCustomResult>();
+            }
+            if (comparison < 0)
+            {
+                InnerConvenience.ClickAtLocation(Session.Driver, CenterOfWheel.X, CenterOfWheel.Y - 50);
+                Thread.Sleep(500);
+
+                return Click<TCustomResult>();
+            }
+
+            if (Option.Equals(currentValue))
+                return Session.CurrentBlock<TCustomResult>();
+
+            throw new NoSuchElementException("Could not find option - " + Option);
         }
     }
 }

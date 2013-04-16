@@ -40,5 +40,17 @@ namespace BumblebeeIOS.Implementation
             return new Size(int.Parse(((Dictionary<string, object>)dict["size"])["width"].ToString()),
                             int.Parse(((Dictionary<string, object>)dict["size"])["height"].ToString()));
         }
+
+        public static void ClickAtLocation(IWebDriver driver, int xPoint, int yPoint)
+        {
+            IWebElement UIAWindow = driver.FindElement(ByIOS.ClassName("UIAWindow"));
+            Size windowSize = GetElementSize(UIAWindow);
+
+            double xPts = (double)xPoint / windowSize.Width;
+            double yPts = (double)yPoint / (windowSize.Height + 20);
+
+            ((IJavaScriptExecutor) driver).ExecuteScript("UIATarget.localTarget().frontMostApp().tapWithOptions({'tapOffset':{'x':" +
+                                                         xPts + ",'y':" + yPts + "}});");
+        }
     }
 }
