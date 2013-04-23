@@ -27,13 +27,16 @@ namespace BumblebeeIOS
             return IOSCapabilities.Ipad("Safari");
         }
 
-        public static IOSCapabilities Iphone(string bundleName)
+        public static DesiredCapabilities Iphone(string bundleName)
         {
-            IOSCapabilities res = new IOSCapabilities();
+            DesiredCapabilities res = new DesiredCapabilities();
             res.SetCapability(DEVICE, "iphone");
             res.SetCapability(LANGUAGE, "en");
             res.SetCapability(LOCALE, "en_GB");
             res.SetCapability(BUNDLE_NAME, bundleName);
+            res.SetCapability(SIMULATOR, true);
+            res.SetCapability(TIME_HACK, false);
+            res.IsJavaScriptEnabled = true;
             return res;
         }
 

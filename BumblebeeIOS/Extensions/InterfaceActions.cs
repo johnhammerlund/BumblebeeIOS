@@ -109,7 +109,7 @@ namespace BumblebeeIOS.Extensions
             return TapWithFingers<TResult>(clickable, numberOfFingers, duration);
         }
 
-        public static IBlock TapWithFingers<TResult>(this IClickable<TResult> clickable, int numberOfFingers, int duration = 0) 
+        public static TResult TapWithFingers<TResult>(this IClickable<TResult> clickable, int numberOfFingers, int duration = 0) 
             where TResult : IBlock
         {
             if (numberOfFingers < 1 || numberOfFingers > 5)
