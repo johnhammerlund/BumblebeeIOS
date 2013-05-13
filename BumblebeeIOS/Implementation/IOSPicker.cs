@@ -14,6 +14,11 @@ using OpenQA.Selenium;
 
 namespace BumblebeeIOS.Implementation
 {
+
+    /// <summary>
+    /// A normal IOSPickerWheel that uses UIAutomation to select a given value.
+    /// </summary>
+    /// <typeparam name="TResult">Standard Page Object return type</typeparam>
     public class IOSPickerWheel<TResult> : Element, ISelectBox<TResult> where TResult : IBlock
     {
         public IOSPickerWheel(IBlock parent, By @by) : base(parent, @by)
@@ -50,6 +55,11 @@ namespace BumblebeeIOS.Implementation
         }
     }
 
+    /// <summary>
+    /// Good for year pickers, constructs options using only a segment of the existing (often >10000) options and uses
+    /// UIAutomation to select a given value.
+    /// </summary>
+    /// <typeparam name="TResult">Standard Page Object return type</typeparam>
     public class OrderedIOSPickerWheel<TResult> : IOSPickerWheel<TResult> where TResult : IBlock
     {
         public OrderedIOSPickerWheel(IBlock parent, By @by) : base(parent, @by)
@@ -91,6 +101,10 @@ namespace BumblebeeIOS.Implementation
         }
     }
 
+    /// <summary>
+    /// Uses wheel traversal/comparison for finds, use only in special cases when Instruments does not properly populate the picker.
+    /// </summary>
+    /// <typeparam name="TResult">Standard Page Object return type</typeparam>
     public class SafeIOSPickerWheel<TResult> : IOSPickerWheel<TResult> where TResult : IBlock
     {
         public SafeIOSPickerWheel(IBlock parent, By @by)
@@ -109,6 +123,10 @@ namespace BumblebeeIOS.Implementation
         }
     }
 
+    /// <summary>
+    /// Uses wheel traversal/comparison for finds. USE AT YOUR OWN RISK as traversals may become infinite.
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
     public class SafeOrderedIOSPickerWheel<TResult> : OrderedIOSPickerWheel<TResult> where TResult : IBlock
     {
         public SafeOrderedIOSPickerWheel(IBlock parent, By @by) : base(parent, @by)
@@ -218,8 +236,7 @@ namespace BumblebeeIOS.Implementation
             CurrentValue =
                     ((string)((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", PickerTag)) ?? "";
 
-            if (Option.Equals(CurrentValue) || (CurrentValue.EndsWith(". " + Position + " of " + NumValues) &&
-                                                Option.Equals(CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)))))
+            if (CurrentValue.IndexOf(Option, StringComparison.Ordinal) == 0)
                 return true;
 
             if (Position > 1)
@@ -240,8 +257,7 @@ namespace BumblebeeIOS.Implementation
             CurrentValue =
                     (string)(((IJavaScriptExecutor)Session.Driver).ExecuteScript("return arguments[0].value()", PickerTag)) ?? "";
 
-            if (Option.Equals(CurrentValue) || (CurrentValue.EndsWith(". " + Position + " of " + NumValues) &&
-                                                Option.Equals(CurrentValue.Substring(0, CurrentValue.LastIndexOf(".", StringComparison.Ordinal)))))
+            if (CurrentValue.IndexOf(Option, StringComparison.Ordinal) == 0)
                 return true;
 
             if (Position < NumValues)
