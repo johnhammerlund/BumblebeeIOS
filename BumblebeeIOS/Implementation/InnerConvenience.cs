@@ -43,7 +43,7 @@ namespace BumblebeeIOS.Implementation
 
         public static void ClickAtLocation(IWebDriver driver, int xPoint, int yPoint)
         {
-            IWebElement UIAWindow = driver.FindElement(ByIOS.ClassName("UIAWindow"));
+            IWebElement UIAWindow = driver.FindElement(ByIOS.Type("UIAWindow"));
             Size windowSize = GetElementSize(UIAWindow);
 
             double xPts = (double)xPoint / windowSize.Width;

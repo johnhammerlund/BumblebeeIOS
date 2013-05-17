@@ -39,7 +39,7 @@ namespace BumblebeeIOS
             return By.PartialLinkText("name=l10n('" + key + "')");
         }
 
-        public static By ClassName(string key)
+        public static By Type(string key)
         {
             return By.ClassName(key);
         }

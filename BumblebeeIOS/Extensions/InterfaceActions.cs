@@ -29,7 +29,7 @@ namespace BumblebeeIOS.Extensions
             where TParent : IBlock
         {
             IElement element = getDraggable.Invoke(parent);
-            IWebElement window = element.Session.Driver.FindElement(ByIOS.ClassName("UIAWindow"));
+            IWebElement window = element.Session.Driver.FindElement(ByIOS.Type("UIAWindow"));
 
             Point location = InnerConvenience.GetElementLocation(element.Tag);
             Size windowSize = InnerConvenience.GetElementSize(window);
@@ -43,7 +43,7 @@ namespace BumblebeeIOS.Extensions
             where TParent : IBlock
         {
             IElement element = getDraggable.Invoke(parent);
-            IWebElement window = element.Session.Driver.FindElement(ByIOS.ClassName("UIAWindow"));
+            IWebElement window = element.Session.Driver.FindElement(ByIOS.Type("UIAWindow"));
 
             Point location = InnerConvenience.GetElementLocation(element.Tag);
             Size windowSize = InnerConvenience.GetElementSize(window);
