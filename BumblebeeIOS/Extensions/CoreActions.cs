@@ -19,10 +19,20 @@ namespace BumblebeeIOS.Extensions
             return result.Session.CurrentBlock<TResult>();
         }
 
+        public static TResult HideApp<TResult>(this TResult result, int seconds) where TResult : IBlock
+        {
+            return ((IBlock)result).HideApp<TResult>(seconds);
+        }
+
         public static TResult LockPhone<TResult>(this IBlock result, int seconds) where TResult : IBlock
         {
             ((IJavaScriptExecutor)result.Session.Driver).ExecuteScript("UIATarget.localTarget().lockForDuration(" + seconds + ");");
             return result.Session.CurrentBlock<TResult>();
+        }
+
+        public static TResult LockPhone<TResult>(this TResult result, int seconds) where TResult : IBlock
+        {
+            return ((IBlock)result).LockPhone<TResult>(seconds);
         }
 
         public static TResult SetLocation<TResult>(this TResult result, double latitude, double longitude)

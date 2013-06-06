@@ -31,8 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bumblebee, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Bumblebee">
       <HintPath>lib\Bumblebee.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -65,6 +64,7 @@
     <Compile Include="Extensions\CoreActions.cs" />
     <Compile Include="Extensions\InterfaceActions.cs" />
     <Compile Include="Extensions\Nonstandard.cs" />
+    <Compile Include="Implementation\IOSMonkey.cs" />
     <Compile Include="Implementation\IOSPlatform.cs" />
     <Compile Include="Implementation\InnerConvenience.cs" />
     <Compile Include="Implementation\IOSTextField.cs" />
