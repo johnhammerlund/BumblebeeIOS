@@ -13,10 +13,25 @@ namespace BumblebeeIOS.Implementation
 {
     public class IOSMonkey : Monkey
     {
+        private DateTime _readyTime;
+
+        private TimeSpan _interval;
+
+        private bool _actionWasPerformed;
+
+        private double _baseProbability;
+
         public IOSMonkey()
         {
             Logs = new List<string>();
-            Probability = 0;
+            _baseProbability = 0;
+            _readyTime = DateTime.Now;
+            _interval = TimeSpan.FromSeconds(1);
+        }
+
+        public override void SetProbability(double probability)
+        {
+            Probability = _baseProbability = probability;
         }
 
         public override void VerifyState()
@@ -27,14 +42,29 @@ namespace BumblebeeIOS.Implementation
         public override void Invoke(IBlock block)
         {
             Block = block;
-            PerformRandomAction();
-            
-            try
+
+            if (DateTime.Now > _readyTime)
             {
-                VerifyState();
-            } catch
-            {
-                Logs.Add("Monkey Verification failed at " + Block.GetType());
+                PerformRandomAction();
+
+                if (_actionWasPerformed)
+                {
+                    try
+                    {
+                        VerifyState();
+                    }
+                    catch
+                    {
+                        Logs.Add("Monkey Verification failed at " + Block.GetType());
+                        throw;
+                    }
+                    Probability = _baseProbability;
+                    _readyTime = DateTime.Now + _interval;
+                }
+                else
+                {
+                    Probability += _baseProbability < 0.1 ? 0 : (1 - Probability) / 3;
+                }
             }
         }
 
@@ -42,7 +72,7 @@ namespace BumblebeeIOS.Implementation
         {
             double random = new Random().NextDouble();
 
-            if (random < Probability)
+            if (random < _baseProbability)
             {
                 switch ((int)(random * 10) % 2)
                 {
@@ -55,11 +85,11 @@ namespace BumblebeeIOS.Implementation
                         Logs.Add("App hidden at " + Block.GetType());
                         break;
                 }
+                _actionWasPerformed = true;
+                return;
             }
-            else
-            {
-                Console.WriteLine("Monkey ignored at " + Block.GetType());
-            }
+            Logs.Add("Monkey ignored at " + Block.GetType());
+            _actionWasPerformed = false;
         }
 
         protected void LockPhone()

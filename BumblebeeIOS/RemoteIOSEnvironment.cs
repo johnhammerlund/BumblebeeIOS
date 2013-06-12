@@ -11,6 +11,7 @@ namespace BumblebeeIOS
     {
         private string _address;
         private DesiredCapabilities _capabilities;
+        private TimeSpan _commandTimeout;
 
         /// <summary>
         /// Constructs a Bumblebee iOS test environment with minimum requirements.
@@ -57,16 +58,21 @@ namespace BumblebeeIOS
         {
         }
 
-
         public RemoteIOSEnvironment(string address, DesiredCapabilities capabilities)
+            : this(address, capabilities, TimeSpan.FromSeconds(1))
+        {
+        }
+
+        public RemoteIOSEnvironment(string address, DesiredCapabilities capabilities, TimeSpan commandTimeout)
         {
             _address = address;
             _capabilities = capabilities;
+            _commandTimeout = commandTimeout;
         }
 
         public IWebDriver CreateWebDriver()
         {
-            return new RemoteWebDriver(new Uri(_address), _capabilities);
+            return new RemoteWebDriver(new Uri(_address), _capabilities, _commandTimeout);
         }
 
     }
